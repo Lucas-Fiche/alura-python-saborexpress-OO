@@ -1,3 +1,5 @@
+from modelos.avaliacao import Avaliacao
+
 class Restaurante:
 
     restaurantes = []
@@ -6,6 +8,7 @@ class Restaurante:
         self._nome = nome.title()
         self._categoria = categoria.upper()
         self._ativo = False
+        self._avaliacao = []
         Restaurante.restaurantes.append(self)
 
     def __str__(self):
@@ -13,9 +16,9 @@ class Restaurante:
     
     @classmethod
     def listar_restaurantes(cls):
-          print(f'{'Nome:'.ljust(25)} | {'Categoria:'.ljust(25)} | {'Status:'}')
+          print(f'{'Nome:'.ljust(25)} | {'Categoria:'.ljust(25)} | {'Avaliação:'.ljust(25)} | {'Status:'}')
           for restaurante in cls.restaurantes:
-               print(f'{restaurante._nome.ljust(25)} | {restaurante._categoria.ljust(25)} | {restaurante.ativo}')  
+               print(f'{restaurante._nome.ljust(25)} | {restaurante._categoria.ljust(25)} | {str(restaurante.media_avaliacoes).ljust(25)} | {restaurante.ativo}')  
     @property
     def ativo(self):
          return '✅' if self._ativo else '❌'
@@ -23,18 +26,16 @@ class Restaurante:
     def alternar_estado(self):
          self._ativo = not self._ativo
 
-
-
-restaurante_praca = Restaurante('praça', 'Gourmet')
-restaurante_praca.alternar_estado()
-# restaurante_praca.nome = 'Praça'
-# restaurante_praca.categoria = 'Italiana'
-
-restaurante_pizza = Restaurante('pizza express', 'Italiana')
-# restaurante_pizza.nome = 'Pizza Place'
-# restaurante_pizza.categoria = 'Fast Food'
-
-#print(dir(restaurante_praca))
-#print(vars(restaurante_praca))
-
-Restaurante.listar_restaurantes()
+    def receber_avaliacao(self, cliente, nota):
+        if 0 < nota >= 5:
+            avaliacao = Avaliacao(cliente, nota)
+            self._avaliacao.append(avaliacao)
+                
+    @property
+    def media_avaliacoes(self):
+        if not self._avaliacao:
+             return f'Sem Avaliações'
+        soma_das_notas = sum(avaliacao._nota for avaliacao in self._avaliacao)
+        quantidade_notas = len(self._avaliacao)
+        media = round(soma_das_notas/quantidade_notas, 1)
+        return media
